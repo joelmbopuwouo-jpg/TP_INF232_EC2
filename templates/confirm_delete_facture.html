@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Confirmer suppression facture</title>
+</head>
+<body>
+  <h2>Supprimer la facture #{{ f.id }}</h2>
+  <p>Produit: {{ f.produit.nom if f.produit else '—' }} | Prix: {{ f.prix }} | Client: {{ f.client.nom if f.client else '—' }}</p>
+  <form method="post">
+    <button type="submit">Confirmer la suppression</button>
+    <a href="{{ url_for('factures') }}">Annuler</a>
+  </form>
+</body>
+</html>

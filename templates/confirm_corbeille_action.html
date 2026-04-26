@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Confirmer action corbeille</title>
+</head>
+<body>
+  <h2>Confirmer {{ action }} pour {{ model }} #{{ obj.id }}</h2>
+  <p>Détails :
+    {% if model == 'commande' %}
+      Boutique: {{ obj.boutique.nom if obj.boutique else '—' }} | Client: {{ obj.client.nom if obj.client else '—' }} | Total: {{ obj.total }}
+    {% elif model == 'produit' %}
+      Nom: {{ obj.nom }} | Boutique: {{ obj.boutique.nom if obj.boutique else '—' }}
+    {% elif model == 'facture' %}
+      Produit: {{ obj.produit.nom if obj.produit else '—' }} | Prix: {{ obj.prix }}
+    {% elif model == 'client' %}
+      Nom: {{ obj.nom }}
+    {% elif model == 'vendeur' %}
+      Nom: {{ obj.nom }}
+    {% elif model == 'boutique' %}
+      Nom: {{ obj.nom }}
+    {% endif %}
+  </p>
+  <form method="post">
+    <button type="submit">Confirmer</button>
+    <a href="{{ url_for('corbeille') }}">Annuler</a>
+  </form>
+</body>
+</html>

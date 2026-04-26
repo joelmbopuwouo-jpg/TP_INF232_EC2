@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Ajouter un produit</title>
+    <style>
+        body{font-family:sans-serif;padding:20px}
+        .flashes { list-style: none; padding: 0; margin: 10px 0; }
+        .flashes li { padding: 10px 12px; border-radius: 6px; margin-bottom: 8px; }
+        .flashes .success { background: #e6ffed; border-left: 6px solid #2e7d32; }
+        .flashes .info { background: #e8f4ff; border-left: 6px solid #1976d2; }
+        .flashes .error { background: #ffe6e6; border-left: 6px solid #d32f2f; }
+    </style>
+</head>
+<body>
+    <h2>Ajouter un produit (marché: {{ marche }})</h2>
+    <form action="{{ url_for('ajouter') }}" method="POST">
+        <input type="hidden" name="marche" value="{{ marche }}">
+        <label>Boutique :</label>
+        <select name="boutique" required>
+            {% if boutiques %}
+                {% for b in boutiques %}
+                <option value="{{ b.id }}">{{ b.nom }} ({{ b.marche }})</option>
+                {% endfor %}
+            {% else %}
+                <option value="">-- Aucune boutique, ajoutez-en une ci-dessous --</option>
+            {% endif %}
+        </select><br>
+
+        <label>Nom du produit :</label>
+        <input type="text" name="produit" required><br>
+
+        <label>Catégorie :</label>
+        <select name="categorie">
+            {% for cat in categories %}
+            <option value="{{ cat }}">{{ cat }}</option>
+            {% endfor %}
+        </select><br>
+
+        <label>Prix :</label>
+        <input type="number" name="prix" step="0.01" required><br><br>
+        <button type="submit" style="background:green;color:white">Ajouter</button>
+    </form>
+    <p><a href="{{ url_for('home') }}">Retour</a></p>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                {% for category, msg in messages %}
+                    <li class="{{ category }}">{{ msg }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+    <hr>
+    <h3>Ajouter une boutique pour ce marché</h3>
+    <form action="{{ url_for('boutiques') }}" method="POST">
+        <input type="hidden" name="marche" value="{{ marche }}">
+        <input type="hidden" name="next" value="{{ url_for('ajouter') }}?marche={{ marche }}">
+        <label>Nom boutique :</label>
+        <input name="nom" required>
+        <label>Adresse :</label>
+        <input name="adresse"><br><br>
+        <button type="submit" style="background:blue;color:white">Créer la boutique et revenir</button>
+    </form>
+</body>
+</html>

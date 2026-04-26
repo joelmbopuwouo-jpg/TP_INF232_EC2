@@ -1,0 +1,21 @@
+# Exemple render.yaml pour déployer une Web Service sur Render
+# Remplacez les placeholders par vos valeurs réelles
+services:
+  - type: web
+    name: tp-inf232-economie
+    env: docker
+    plan: free
+    repo: <your-git-repo-url>
+    branch: main
+    buildCommand: docker build -t tp-inf232-economie .
+    startCommand: gunicorn -w 4 -b 0.0.0.0:$PORT app2:app
+    envVars:
+      - key: SECRET_KEY
+        fromDatabase: false
+        value: "__CHANGE_ME__"
+      - key: FLASK_DEBUG
+        fromDatabase: false
+        value: "0"
+      - key: SQLALCHEMY_DATABASE_URI
+        fromDatabase: false
+        value: "sqlite:///economie.db"

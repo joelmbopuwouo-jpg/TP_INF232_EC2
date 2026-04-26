@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Bilan des ventes</title>
+  <style>body{font-family:sans-serif;padding:20px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8px}</style>
+</head>
+<body>
+  <h2>Bilan</h2>
+  <p>Total produits enregistrés : <strong>{{ total }}</strong></p>
+  <p>Produits vendus : <strong>{{ sold }}</strong></p>
+  <p>Produits restants : <strong>{{ remaining }}</strong></p>
+
+  <h3>Produits vendus</h3>
+  {% if sold_list %}
+  <table>
+    <tr><th>Produit</th><th>Boutique</th><th>Vendeur</th><th>Client</th><th>Date</th></tr>
+    {% for f in sold_list %}
+    <tr>
+      <td>{{ f.produit.nom if f.produit else '—' }}</td>
+      <td>{{ f.boutique.nom if f.boutique else '—' }}</td>
+      <td>{{ f.vendeur.nom if f.vendeur else '—' }}</td>
+      <td>{{ f.client.nom if f.client else '—' }}</td>
+      <td>{{ f.date.strftime('%d/%m/%Y %H:%M') }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+    <p>Aucun produit vendu.</p>
+  {% endif %}
+
+  <h3 style="margin-top:18px">Produits restants</h3>
+  {% if remaining_list %}
+  <table>
+    <tr><th>Produit</th><th>Catégorie</th><th>Prix</th><th>Boutique</th></tr>
+    {% for p in remaining_list %}
+    <tr>
+      <td>{{ p.nom }}</td>
+      <td>{{ p.categorie }}</td>
+      <td>{{ p.prix }} FCFA</td>
+      <td>{{ p.boutique.nom if p.boutique else '—' }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+    <p>Aucun produit restant.</p>
+  {% endif %}
+
+  <p><a href="{{ url_for('home') }}">Retour</a> | <a href="{{ url_for('factures') }}">Voir factures</a></p>
+</body>
+</html>

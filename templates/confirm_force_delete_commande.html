@@ -1,0 +1,16 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Confirmer suppression forcée commande</title>
+</head>
+<body>
+  <h2>Forcer la suppression (soft-delete) de la commande #{{ com.id }}</h2>
+  <p>Boutique: {{ com.boutique.nom if com.boutique else '—' }} | Client: {{ com.client.nom if com.client else '—' }} | Total: {{ com.total }}</p>
+  <p>Cette opération marquera la commande comme supprimée (champ `supprime=True`) et elle n'apparaîtra plus dans la liste. Les données restent en base pour audit.</p>
+  <form method="post">
+    <button type="submit">Confirmer suppression forcée</button>
+    <a href="{{ url_for('commandes') }}">Annuler</a>
+  </form>
+</body>
+</html>

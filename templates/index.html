@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mon TP Economie</title>
+    <style>
+        body { font-family: sans-serif; display: flex; gap: 20px; padding: 20px; background: #eee; }
+        .section { background: white; padding: 15px; border-radius:8px; flex: 1; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .stats-box { background: #e3f2fd; padding: 10px; border-left:5px solid #2196f3 }
+    .stats-button { display: block; text-decoration: none; color: inherit; padding: 14px; border-radius:8px; cursor: pointer; transition: box-shadow 180ms ease, transform 120ms ease; box-shadow: 0 1px 0 rgba(0,0,0,0.04); }
+    .stats-button:hover { background: rgba(0,0,0,0.03); box-shadow: 0 6px 18px rgba(0,0,0,0.08); transform: translateY(-2px); }
+    .stats-button:active { transform: translateY(0); }
+    </style>
+</head>
+<body>
+ 
+<div class="section">
+    <h2>Enregistrement</h2>
+    <!-- Premier étape : choisir le marché puis continuer -->
+    <form action="{{ url_for('enregistrer_marche') }}" method="POST">
+        <label>Marché :</label>
+        <input type="text" name="marche" placeholder="Marche" required>
+        <button type="submit" style="background:green;color:white">Enregistrer le marché</button>
+    </form>
+        <p>
+                <a href="{{ url_for('boutiques') }}">Gérer les boutiques</a> &nbsp;|&nbsp;
+                <a href="{{ url_for('vendeurs') }}">Gérer les vendeurs</a> &nbsp;|&nbsp;
+                <a href="{{ url_for('clients') }}">Gérer les clients</a> &nbsp;|&nbsp;
+                <a href="{{ url_for('factures') }}">Factures</a> &nbsp;|&nbsp;
+                <a href="{{ url_for('commandes') }}">Commandes</a> &nbsp;|&nbsp;
+                <a href="{{ url_for('bilan') }}">Bilan</a> &nbsp;|&nbsp;
+                <a href="{{ url_for('corbeille') }}">Corbeille</a> &nbsp;|&nbsp;
+                <a href="{{ url_for('registre') }}">Registre</a>
+                <br><small>ajouter boutiques/vendeurs/clients selon les marchés</small>
+            </p>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                {% for category, msg in messages %}
+                    <li class="{{ category }}">{{ msg }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+    <br>
+    <a href="{{ url_for('quitter') }}" style="background: red; color: white; padding:10px 14px; border-radius:6px; text-decoration:none; display:inline-block;">Quitter l'application</a>
+</div>
+
+<div class="section">
+    <h2>Ajouter un produit rapide</h2>
+    <!-- Compact clickable card: choose marché, then aller au formulaire d'ajout complet -->
+    <form action="{{ url_for('ajouter') }}" method="GET" style="display:flex;flex-direction:column;gap:8px;">
+        <label>Marché:
+            <select name="marche" required>
+                {% if marches %}
+                    <option value="">-- Sélectionnez un marché --</option>
+                    {% for m in marches %}
+                        <option value="{{ m }}">{{ m }}</option>
+                    {% endfor %}
+                {% else %}
+                    <option value="">(Aucun marché enregistré)</option>
+                {% endif %}
+            </select>
+        </label>
+        <button type="submit" class="stats-button" style="background:#2e7d32;color:#fff;">Ajouter un produit pour le marché sélectionné</button>
+        <div style="font-size:13px;color:#666">Si la boutique existe pour ce marché, vous pourrez la sélectionner dans l'étape suivante.</div>
+    </form>
+</div>
+
+<div class="section">
+    <h2>analyse Descriptive</h2>
+    <div class="stats-box">
+        <!-- Transforme la zone en bouton vers la page d'analyse complète -->
+        <a href="{{ url_for('analyse') }}" class="stats-button" aria-label="Ouvrir l'analyse descriptive">
+            <span class="stats-icon" aria-hidden="true">
+                <!-- petite icône SVG représentant un histogramme -->
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" role="img">
+                  <rect x="3" y="10" width="3" height="11" rx="0.5" fill="#1976d2" />
+                  <rect x="9" y="6" width="3" height="15" rx="0.5" fill="#42a5f5" />
+                  <rect x="15" y="2" width="3" height="19" rx="0.5" fill="#90caf9" />
+                </svg>
+            </span>
+            <strong style="vertical-align:middle;">Analyse descriptive</strong>
+            <div style="margin-top:8px; font-size:13px; color:#333">Cliquez pour afficher l'analyse complète et la liste des produits enregistrés</div>
+        </a>
+    </div>
+
+    <!-- La liste complète des produits a été déplacée vers la page d'analyse (/analyse) -->
+    <p style="margin-top:14px; color:#444">Pour voir la liste complète des produits et le graphique, cliquez sur "Analyse descriptive".</p>
+</div>
+
+</body>
+<!-- Graphique rendu côté serveur, aucun script JS nécessaire -->
+</html>

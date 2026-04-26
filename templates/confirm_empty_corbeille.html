@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Vider la corbeille</title>
+</head>
+<body>
+  <h2>Vider la corbeille</h2>
+  <p>Cette opération supprimera définitivement tous les éléments marqués comme supprimés (commandes, factures, produits, clients, vendeurs, boutiques). Cette action est irréversible.</p>
+  <form method="post">
+    <button type="submit">Confirmer la suppression définitive de la corbeille</button>
+    <a href="{{ url_for('corbeille') }}">Annuler</a>
+  </form>
+</body>
+</html>

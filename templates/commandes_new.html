@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Nouvelle commande</title>
+  <style>body{font-family:sans-serif;padding:20px}.card{background:#fff;padding:16px;border-radius:8px}</style>
+</head>
+<body>
+  <div class="card">
+    <h2>Nouvelle commande</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul>
+        {% for category, msg in messages %}
+          <li class="{{ category }}">{{ msg }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <form method="get" action="{{ url_for('commandes_new') }}">
+      <label>Boutique:</label>
+      <select name="boutique_id">
+        <option value="">-- Choisir --</option>
+        {% for b in boutiques %}
+        <option value="{{ b.id }}" {% if selected_boutique and (selected_boutique|int)==b.id %}selected{% endif %}>{{ b.nom }} ({{ b.marche }})</option>
+        {% endfor %}
+      </select>
+      <button type="submit">Afficher produits</button>
+    </form>
+
+    <form method="post" action="{{ url_for('commandes_new') }}">
+      <input type="hidden" name="boutique_id" value="{{ selected_boutique or '' }}">
+      <p>
+        <label>Client:</label>
+        <select name="client_id" required>
+          <option value="">-- Choisir --</option>
+          {% for c in clients %}
+          <option value="{{ c.id }}">{{ c.nom }}{% if c.boutique %} ({{ c.boutique.nom }}){% endif %}</option>
+          {% endfor %}
+        </select>
+      </p>
+      <p>
+        <label>Vendeur (optionnel):</label>
+        <select name="vendeur_id">
+          <option value="">-- Aucun --</option>
+          {% for v in vendeurs %}
+            <option value="{{ v.id }}">{{ v.nom }}</option>
+          {% endfor %}
+        </select>
+      </p>
+
+      {% if produits %}
+        <h3>Produits</h3>
+        <table>
+          <tr><th>Produit</th><th>Prix</th><th>Stock</th><th>Quantité</th></tr>
+          {% for p in produits %}
+          <tr>
+            <td>{{ p.nom }}</td>
+            <td>{{ p.prix }} FCFA</td>
+            <td>{{ p.quantite or 0 }}</td>
+            <td><input type="number" name="qty_{{ p.id }}" min="0" value="0"></td>
+          </tr>
+          {% endfor %}
+        </table>
+        <p><button type="submit">Enregistrer la commande</button></p>
+      {% else %}
+        <p>Sélectionnez une boutique et cliquez sur "Afficher produits" pour choisir des articles.</p>
+      {% endif %}
+    </form>
+
+    <p><a href="{{ url_for('commandes') }}">← Retour aux commandes</a></p>
+  </div>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Corbeille</title>
+  <style>body{font-family:sans-serif;padding:20px} table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8px}</style>
+</head>
+<body>
+  <h2>Corbeille - éléments supprimés</h2>
+  <p><a href="{{ url_for('home') }}">Retour</a></p>
+  <p><a href="{{ url_for('corbeille_vider') }}">Vider la corbeille</a></p>
+
+  <h3>Commandes</h3>
+  {% if commandes %}
+    <table>
+      <tr><th>Id</th><th>Boutique</th><th>Client</th><th>Total</th><th>Date</th><th>Actions</th></tr>
+      {% for c in commandes %}
+      <tr>
+        <td>{{ c.id }}</td>
+        <td>{{ c.boutique.nom if c.boutique else '' }}</td>
+        <td>{{ c.client.nom if c.client else '' }}</td>
+        <td>{{ c.total }}</td>
+        <td>{{ c.date.strftime('%d/%m/%Y') }}</td>
+        <td>
+          <a href="{{ url_for('corbeille_restore', model='commande', id=c.id) }}">Restaurer</a> |
+          <a href="{{ url_for('corbeille_delete_permanent', model='commande', id=c.id) }}">Supprimer définitivement</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  {% else %}<p>Aucune commande supprimée.</p>{% endif %}
+
+  <h3>Factures</h3>
+  {% if factures %}
+    <table>
+      <tr><th>Id</th><th>Produit</th><th>Client</th><th>Prix</th><th>Date</th><th>Actions</th></tr>
+      {% for f in factures %}
+      <tr>
+        <td>{{ f.id }}</td>
+        <td>{{ f.produit.nom if f.produit else '' }}</td>
+        <td>{{ f.client.nom if f.client else '' }}</td>
+        <td>{{ f.prix }}</td>
+        <td>{{ f.date.strftime('%d/%m/%Y') }}</td>
+        <td>
+          <a href="{{ url_for('corbeille_restore', model='facture', id=f.id) }}">Restaurer</a> |
+          <a href="{{ url_for('corbeille_delete_permanent', model='facture', id=f.id) }}">Supprimer définitivement</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  {% else %}<p>Aucune facture supprimée.</p>{% endif %}
+
+  <h3>Produits</h3>
+  {% if produits %}
+    <table>
+      <tr><th>Id</th><th>Nom</th><th>Boutique</th><th>Quantité</th><th>Actions</th></tr>
+      {% for p in produits %}
+      <tr>
+        <td>{{ p.id }}</td>
+        <td>{{ p.nom }}</td>
+        <td>{{ p.boutique.nom if p.boutique else '' }}</td>
+        <td>{{ p.quantite }}</td>
+        <td>
+          <a href="{{ url_for('corbeille_restore', model='produit', id=p.id) }}">Restaurer</a> |
+          <a href="{{ url_for('corbeille_delete_permanent', model='produit', id=p.id) }}">Supprimer définitivement</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  {% else %}<p>Aucun produit supprimé.</p>{% endif %}
+
+  <h3>Clients</h3>
+  {% if clients %}
+    <table>
+      <tr><th>Id</th><th>Nom</th><th>Contact</th><th>Actions</th></tr>
+      {% for c in clients %}
+      <tr>
+        <td>{{ c.id }}</td>
+        <td>{{ c.nom }}</td>
+        <td>{{ c.contact }}</td>
+        <td>
+          <a href="{{ url_for('corbeille_restore', model='client', id=c.id) }}">Restaurer</a> |
+          <a href="{{ url_for('corbeille_delete_permanent', model='client', id=c.id) }}">Supprimer définitivement</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  {% else %}<p>Aucun client supprimé.</p>{% endif %}
+
+  <h3>Vendeurs</h3>
+  {% if vendeurs %}
+    <table>
+      <tr><th>Id</th><th>Nom</th><th>Boutique</th><th>Actions</th></tr>
+      {% for v in vendeurs %}
+      <tr>
+        <td>{{ v.id }}</td>
+        <td>{{ v.nom }}</td>
+        <td>{{ v.boutique.nom if v.boutique else '' }}</td>
+        <td>
+          <a href="{{ url_for('corbeille_restore', model='vendeur', id=v.id) }}">Restaurer</a> |
+          <a href="{{ url_for('corbeille_delete_permanent', model='vendeur', id=v.id) }}">Supprimer définitivement</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  {% else %}<p>Aucun vendeur supprimé.</p>{% endif %}
+
+  <h3>Boutiques</h3>
+  {% if boutiques %}
+    <table>
+      <tr><th>Id</th><th>Nom</th><th>Marche</th><th>Actions</th></tr>
+      {% for b in boutiques %}
+      <tr>
+        <td>{{ b.id }}</td>
+        <td>{{ b.nom }}</td>
+        <td>{{ b.marche }}</td>
+        <td>
+          <a href="{{ url_for('corbeille_restore', model='boutique', id=b.id) }}">Restaurer</a> |
+          <a href="{{ url_for('corbeille_delete_permanent', model='boutique', id=b.id) }}">Supprimer définitivement</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  {% else %}<p>Aucune boutique supprimée.</p>{% endif %}
+
+</body>
+</html>

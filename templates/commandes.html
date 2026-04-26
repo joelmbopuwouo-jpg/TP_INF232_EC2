@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Commandes</title>
+  <style>body{font-family:sans-serif;padding:20px}.card{background:#fff;padding:16px;border-radius:8px} table{width:100%;border-collapse:collapse} th,td{border:1px solid #ddd;padding:8px}</style>
+</head>
+<body>
+  <div class="card">
+    <h2>Liste des commandes</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flashes">
+        {% for category, msg in messages %}
+          <li class="{{ category }}">{{ msg }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    {% if commandes %}
+    <table>
+      <tr><th>Date</th><th>Boutique</th><th>Client</th><th>Vendeur</th><th>Total</th><th>Détails</th></tr>
+      {% for c in commandes %}
+      <tr>
+        <td>{{ c.date.strftime('%d/%m/%Y %H:%M') }}</td>
+        <td>{{ c.boutique.nom if c.boutique else '' }}</td>
+        <td>{{ c.client.nom if c.client else '' }}</td>
+        <td>{{ c.vendeur.nom if c.vendeur else '' }}</td>
+        <td>{{ c.total }}</td>
+        <td>
+          <ul>
+            {% for it in c.items %}
+            <li>{{ it.produit.nom }} x{{ it.quantite }} @ {{ it.prix_unitaire }} FCFA</li>
+            {% endfor %}
+          </ul>
+        </td>
+        <td>{{ c.etat }}</td>
+        <td>
+          {% if c.etat == 'nouvelle' %}
+            <a href="{{ url_for('process_commande', id=c.id) }}">Traiter</a>
+          {% else %}
+            —
+          {% endif %}
+        </td>
+        <td><a href="{{ url_for('delete_commande', id=c.id) }}">Supprimer</a> | <a href="{{ url_for('force_delete_commande', id=c.id) }}">Forcer suppression</a></td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% else %}
+      <p>Aucune commande enregistrée.</p>
+    {% endif %}
+    <p><a href="{{ url_for('commandes_new') }}">Nouvelle commande</a></p>
+  </div>
+</body>
+</html>

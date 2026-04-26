@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Recherche produit - Client</title>
+  <style>
+    body{font-family:sans-serif;padding:20px}
+    .flashes { list-style: none; padding: 0; margin: 10px 0; }
+    .flashes li { padding: 10px 12px; border-radius: 6px; margin-bottom: 8px; }
+    .flashes .success { background: #e6ffed; border-left: 6px solid #2e7d32; }
+    .flashes .info { background: #e8f4ff; border-left: 6px solid #1976d2; }
+    .flashes .error { background: #ffe6e6; border-left: 6px solid #d32f2f; }
+    table { border-collapse: collapse; width: 100%; margin-top: 12px }
+    th, td { border: 1px solid #ddd; padding: 8px }
+  </style>
+</head>
+<body>
+  <h2>Recherche de produit (client)</h2>
+
+  <form action="{{ url_for('client_search') }}" method="POST">
+    <label>Client (connectez-vous) :</label>
+    <select name="client_id">
+      <option value="">-- Anonyme --</option>
+      {% for c in clients %}
+      <option value="{{ c.id }}" {% if client and client.id==c.id %}selected{% endif %}>{{ c.nom }}{% if c.boutique %} ({{ c.boutique.nom }}){% endif %}</option>
+      {% endfor %}
+    </select>
+    <br><label>Nom du produit recherché :</label>
+    <input type="text" name="query" value="{{ query or '' }}" placeholder="ex: savon, riz" required>
+    <button type="submit" style="background:green;color:white">Rechercher</button>
+  </form>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <ul class="flashes">
+      {% for category, msg in messages %}
+        <li class="{{ category }}">{{ msg }}</li>
+      {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
+  {% if results is defined %}
+    <h3>Résultats pour "{{ query }}"</h3>
+    {% if results %}
+      <table>
+        <tr><th>Produit</th><th>Catégorie</th><th>Prix</th><th>Boutique</th><th>Marché</th><th>Action</th></tr>
+        {% for p in results %}
+        <tr>
+          <td>{{ p.nom }}</td>
+          <td>{{ p.categorie }}</td>
+          <td>{{ p.prix }} FCFA</td>
+          <td>{{ p.boutique.nom if p.boutique else '—' }}</td>
+          <td>{{ p.marche or (p.boutique.marche if p.boutique else '') }}</td>
+          <td>
+            {% if p.boutique %}
+              <a href="{{ url_for('view_boutique', id=p.boutique.id) }}">Voir la boutique</a>
+            {% else %}
+              —
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+      <p>Aucun produit trouvé pour cette recherche.</p>
+    {% endif %}
+  {% endif %}
+
+  <p><a href="{{ url_for('clients') }}">Retour</a></p>
+</body>
+</html>

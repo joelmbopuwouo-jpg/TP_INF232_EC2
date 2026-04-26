@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Gestion des boutiques</title>
+    <style>
+        body{font-family:sans-serif;padding:20px}
+        .flashes { list-style: none; padding: 0; margin: 10px 0; }
+        .flashes li { padding: 10px 12px; border-radius: 6px; margin-bottom: 8px; }
+        .flashes .success { background: #e6ffed; border-left: 6px solid #2e7d32; }
+        .flashes .info { background: #e8f4ff; border-left: 6px solid #1976d2; }
+        .flashes .error { background: #ffe6e6; border-left: 6px solid #d32f2f; }
+    </style>
+</head>
+<body>
+    <h2>Ajouter une boutique</h2>
+        <form action="{{ url_for('boutiques') }}" method="POST">
+        <label>Nom de la boutique :</label>
+        <input type="text" name="nom" required><br>
+        <label>Marché :</label>
+        <input type="text" name="marche" required><br>
+        <label>Adresse (optionnel) :</label>
+        <input type="text" name="adresse"><br><br>
+                <button type="submit" style="background:green;color:white">Ajouter la boutique</button>
+    </form>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                {% for category, msg in messages %}
+                    <li class="{{ category }}">{{ msg }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+    <h3>Liste des boutiques</h3>
+    <table>
+        <tr><th>Id</th><th>Nom</th><th>Marché</th><th>Adresse</th></tr>
+        {% for b in boutiques %}
+        <tr>
+            <td>{{ b.id }}</td>
+            <td>{{ b.nom }}</td>
+            <td>{{ b.marche }}</td>
+                        <td>{{ b.adresse or '' }}</td>
+                        <td>
+                            <a href="{{ url_for('edit_boutique', id=b.id) }}">Edit</a> |
+                            <a href="{{ url_for('delete_boutique', id=b.id) }}" style="color:red">Delete</a>
+                        </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <p><a href="{{ url_for('home') }}">Retour</a></p>
+</body>
+</html>

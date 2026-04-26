@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Edition produit</title>
+  <style>body{font-family:sans-serif;padding:20px}label{display:block;margin-top:8px}</style>
+</head>
+<body>
+  <h2>Éditer le produit</h2>
+  <form action="{{ url_for('edit_produit', id=p.id) }}" method="POST">
+    <label>Nom</label>
+    <input name="nom" value="{{ p.nom }}" required>
+    <label>Catégorie</label>
+    <input name="categorie" value="{{ p.categorie }}">
+    <label>Prix</label>
+    <input name="prix" value="{{ p.prix }}" required>
+    <label>Quantité</label>
+    <input name="quantite" value="{{ p.quantite or 0 }}" required>
+    <br><br>
+    <button type="submit" style="background:green;color:white">Enregistrer</button>
+  </form>
+  <p><a href="{{ url_for('view_boutique', id=p.boutique.id) }}">← Retour</a></p>
+</body>
+</html>

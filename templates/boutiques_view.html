@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Détails boutique</title>
+  <style>
+    body{font-family:sans-serif;padding:20px}
+    table { border-collapse: collapse; width: 100%; margin-top: 12px }
+    th, td { border: 1px solid #ddd; padding: 8px }
+    .meta { margin-bottom: 12px }
+  </style>
+</head>
+<body>
+  <h2>Boutique: {{ b.nom }}</h2>
+  <div class="meta">
+    <strong>Marché:</strong> {{ b.marche }}<br>
+    <strong>Adresse:</strong> {{ b.adresse or '—' }}
+  </div>
+
+    <h3>Produits disponibles</h3>
+  {% if b.produits %}
+  <table>
+    <tr><th>Produit</th><th>Catégorie</th><th>Prix</th><th>Quantité</th><th>Action</th></tr>
+    {% for p in b.produits %}
+    <tr>
+      <td>{{ p.nom }}</td>
+      <td>{{ p.categorie }}</td>
+      <td>{{ p.prix }} FCFA</td>
+      <td>{{ p.quantite or 0 }}</td>
+      <td>
+        <a href="{{ url_for('factures_new') }}?produit_id={{ p.id }}">Acheter</a>
+        &nbsp;|&nbsp;
+        <a href="{{ url_for('edit_produit', id=p.id) }}">Editer</a>
+  &nbsp;|&nbsp;
+  <a href="{{ url_for('supprimer', id=p.id) }}">Supprimer</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+    <p>Aucun produit enregistré pour cette boutique.</p>
+  {% endif %}
+
+  <p><a href="{{ url_for('boutiques') }}">Retour aux boutiques</a> | <a href="{{ url_for('home') }}">Accueil</a></p>
+</body>
+</html>

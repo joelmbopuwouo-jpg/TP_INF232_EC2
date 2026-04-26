@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Nouvelle facture</title>
+  <style>body{font-family:sans-serif;padding:20px}label{display:block;margin-top:8px}</style>
+</head>
+<body>
+  <h2>Créer une facture</h2>
+  <p>Produit : <strong>{{ produit.nom }}</strong> — Prix proposé : <strong>{{ produit.prix }} FCFA</strong></p>
+  <form action="{{ url_for('factures_new') }}" method="POST">
+    <input type="hidden" name="produit_id" value="{{ produit.id }}">
+    <label>Vendeur :</label>
+    <select name="vendeur_id" required>
+      <option value="">-- Choisir un vendeur --</option>
+      {% for v in vendeurs %}
+      <option value="{{ v.id }}">{{ v.nom }} ({{ v.telephone or '—' }})</option>
+      {% endfor %}
+    </select>
+    <label>Client :</label>
+    <select name="client_id">
+      <option value="">-- Anonyme --</option>
+      {% for c in clients %}
+      <option value="{{ c.id }}">{{ c.nom }}</option>
+      {% endfor %}
+    </select>
+    <label>Prix de vente (FCFA) :</label>
+    <input name="prix" value="{{ produit.prix }}" required>
+    <br><br>
+    <button type="submit" style="background:green;color:white">Confirmer l'achat</button>
+  </form>
+  <p><a href="{{ url_for('view_boutique', id=produit.boutique.id) }}">← Retour à la boutique</a></p>
+</body>
+</html>
