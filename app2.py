@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, Response, flash, abort
+from flask import Flask, render_template, request, redirect, url_for, Response, flash, abort, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import os, signal
@@ -33,12 +33,22 @@ else:
         pass
 
 #con figuration de la base de donnees
-# Determine DB URI: prefer explicit environment variable. If not provided,
-# fall back to the local SQLite file to avoid crashing when Postgres isn't
-# available (useful for quick local testing).
-db_uri = os.environ.get('SQLALCHEMY_DATABASE_URI')
+# Determine DB URI: prefer explicit environment variables. Support both
+# SQLALCHEMY_DATABASE_URI (used by the app) and DATABASE_URL (commonly
+# provided by PaaS providers). If none is provided, fall back to a local
+# SQLite file located inside `app.instance_path` (this may be /tmp/instance
+# on serverless platforms). Note: serverless filesystems are ephemeral —
+# use a proper external database in production (see README/deploy notes).
+db_uri = os.environ.get('SQLALCHEMY_DATABASE_URI') or os.environ.get('DATABASE_URL')
 if not db_uri:
-    db_uri = 'sqlite:///economie.db'
+    try:
+        # ensure instance path exists and use an absolute path for sqlite
+        db_file = os.path.join(app.instance_path, 'economie.db')
+        os.makedirs(os.path.dirname(db_file), exist_ok=True)
+        db_uri = f"sqlite:///{db_file}"
+    except Exception:
+        # final fallback to a relative sqlite path if instance path cannot be used
+        db_uri = 'sqlite:///economie.db'
 
 # If the URI is for Postgres but psycopg2 is not installed, fall back to sqlite
 if db_uri and db_uri.startswith(('postgres://', 'postgresql://')):
@@ -198,6 +208,34 @@ with app.app_context():
     except Exception:
         pass
 
+    # DB writability healthcheck: attempt a small write and rollback/cleanup.
+    # If any write fails, mark the DB as read-only so the UI can warn the user.
+    app.config['DB_READONLY'] = False
+    try:
+        # Use a raw connection to perform a lightweight write test.
+        raw = db.engine.raw_connection()
+        cur = raw.cursor()
+        try:
+            # create a small temporary table if needed, insert then delete
+            cur.execute("CREATE TABLE IF NOT EXISTS __healthcheck (id INTEGER PRIMARY KEY AUTOINCREMENT, ts DATETIME DEFAULT CURRENT_TIMESTAMP)")
+            cur.execute("INSERT INTO __healthcheck DEFAULT VALUES")
+            # commit the insert then delete to exercise write path
+            raw.commit()
+            cur.execute("DELETE FROM __healthcheck WHERE id = (SELECT max(id) FROM __healthcheck)")
+            raw.commit()
+        finally:
+            try:
+                cur.close()
+            except Exception:
+                pass
+            try:
+                raw.close()
+            except Exception:
+                pass
+    except Exception:
+        # cannot write to DB (read-only filesystem, missing permissions, etc.)
+        app.config['DB_READONLY'] = True
+
 @app.route('/')
 def home():
     produits = Produit.query.filter_by(supprime=False).all()
@@ -224,6 +262,23 @@ def home():
                 marches_set.add(p.marche)
     marches = sorted(list(marches_set))
     return render_template('index.html', produits=produits, stats=stats, boutiques=boutiques, categories=categories, marches=marches)
+
+
+@app.before_request
+def warn_if_db_readonly():
+    # show a one-time flash message per session if DB is read-only
+    if app.config.get('DB_READONLY'):
+        if not session.get('db_readonly_warned'):
+            flash('Attention: la base de données semble en lecture seule sur cet environnement. Les modifications risquent de ne pas être persistées. Configurez une base de données externe (Postgres) pour la production.', 'warning')
+            session['db_readonly_warned'] = True
+
+
+@app.route('/db_status')
+def db_status():
+    # Simple status page for debugging/deployers
+    readonly = bool(app.config.get('DB_READONLY'))
+    uri = app.config.get('SQLALCHEMY_DATABASE_URI')
+    return render_template('bilan.html', total=0, sold=0, remaining=0, sold_list=[], remaining_list=[], db_readonly=readonly, db_uri=uri)
 
 @app.route('/ajouter', methods=['GET','POST'])
 def ajouter():
