@@ -40,6 +40,12 @@ else:
 # on serverless platforms). Note: serverless filesystems are ephemeral —
 # use a proper external database in production (see README/deploy notes).
 db_uri = os.environ.get('SQLALCHEMY_DATABASE_URI') or os.environ.get('DATABASE_URL')
+if db_uri:
+    # strip accidental surrounding quotes that might be pasted from a UI
+    db_uri = db_uri.strip().strip('"').strip("'")
+    # SQLAlchemy prefers the 'postgresql://' scheme; some providers return 'postgres://'
+    if db_uri.startswith('postgres://'):
+        db_uri = 'postgresql://' + db_uri[len('postgres://'):]
 if not db_uri:
     try:
         # ensure instance path exists and use an absolute path for sqlite
